@@ -1,0 +1,142 @@
+﻿@model ML.AcuRe
+@{
+    ViewBag.Title = "GetReport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>*@
+
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" />
+
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" />
+
+
+<h2>GetReport</h2>
+
+
+<br />
+<br />
+<br />
+
+<div>
+    @using (Html.BeginForm("GetReport", "AcuseReciboSAP", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+
+        <div class="row">
+            <div class="col-md-6">
+                @Html.TextBoxFor(model => model.FechaBusqueda, new { @class = "form-control hiden" })
+            </div>
+        </div>
+
+        @*<div class="row">
+                <div class="col-md-12">
+                    @Html.LabelFor(model => model.Companyes)
+                    @Html.DropDownListFor(model => model.Companyes.IdCompany, new SelectList(Model.Companyes.Companys, "IdCompany", "NombreCompany"), "Seleccione una opción")
+                </div>
+                @Html.HiddenFor(model => model.Companyes.Companys)
+            </div>*@
+
+
+
+        <button id="exportExcel" class="btn btn-success">Exportar a Excel</button>
+
+
+
+
+
+        <div class="row">
+            <div class="col-md-6">
+                @Html.TextBoxFor(model => model.NombreBusqueda, new { @class = "form-control hiden" })
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                @Html.TextBoxFor(model => model.FechaB, new { @class = "form-control hiden" })
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <input type="submit" data-toggle="modal" class="btn btn-success" value="Buscar" />
+        </div>
+    }
+</div>
+
+<div>
+    @using (Html.BeginForm("DownloadExcel", "AcuseReciboSAP", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <input type="hidden" name="Fechabusqueda" value="@Model.FechaBusqueda" />
+        <input type="hidden" name="NombreBusqueda" value="@Model.NombreBusqueda" />
+        <input type="hidden" name="FechaB" value="@Model.FechaB" />
+
+        <button type="submit" class="btn btn-success">Descargar Excel</button>
+    }
+</div>
+<br />
+<br />
+<br />
+
+
+@if (Model.AcureS != null)
+{
+    <div class="row">
+        <div class="col col-md-12">
+            <div class="table table-responsive">
+                <table id="myTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Cliente</th>
+                            <th>Ruta Original</th>
+                            <th>Nombre del Archivo</th>
+                            <th>Ruta SAP</th>
+                            <th>Status</th>
+                            <th>Fecha de carga</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (ML.AcuRe acu in Model.AcureS)
+                        {
+                            <tr>
+                                <td>@acu.SegCompany</td>
+                                <td>@acu.SegClient</td>
+                                <td>@acu.RouteFileOriginal</td>
+                                <td>@acu.FileNameComplete</td>
+                                <td>@acu.RouteFileSape</td>
+                                <td>@acu.Status</td>
+                                <td>@acu.CreationDate</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            let table = new DataTable('#myTable', {
+                // opciones
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ]
+            });
+        });
+
+    </script>
+}
